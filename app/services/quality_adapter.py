@@ -1,3 +1,4 @@
+import pandas as pd
 
 from app.services.dataset_loader import load_dataset
 from app.services.team1_data_quality import DataQualityEngine
@@ -12,6 +13,23 @@ def check_data_quality(
     try:
         # Load dataset
         df = load_dataset(dataset_source)
+
+        # Handle empty datasets
+        if df is None or df.empty:
+            return {
+                "status": "failed",
+                "validation_summary": {
+                    "total_issues_detected": 0,
+                    "total_duplicate_records": 0,
+                    "execution_mode": "non_destructive",
+                    "source_mutated": False
+                },
+                "issue_logs": [],
+                "errors": [{
+                    "code": "EMPTY_DATASET",
+                    "message": "Dataset is empty. At least one data row is required."
+                }]
+            }
 
         # Run Team 1 Data Quality Engine
         engine = DataQualityEngine(
@@ -65,6 +83,22 @@ def check_data_quality(
             "errors": [{
                 "code": "SOURCE_NOT_FOUND",
                 "message": "Dataset file was not found."
+            }]
+        }
+
+    except pd.errors.EmptyDataError:
+        return {
+            "status": "failed",
+            "validation_summary": {
+                "total_issues_detected": 0,
+                "total_duplicate_records": 0,
+                "execution_mode": "non_destructive",
+                "source_mutated": False
+            },
+            "issue_logs": [],
+            "errors": [{
+                "code": "EMPTY_DATASET",
+                "message": "Dataset is empty or contains no readable data."
             }]
         }
 
