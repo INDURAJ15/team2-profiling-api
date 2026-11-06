@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DataQualityReport",
+  "module": "DataQualityAnalyzer",
+  "version": "1.0",
+  "timestamp": "2026-11-04T14:47:00Z",
+  "dataset_summary": {
+    "dataset_reference": "HumanResources.Employee (1).xlsx",
+    "dataset_rows": 290,
+    "dataset_columns": 16
+  },
+  "execution_status": {
+    "status": "SUCCESS",
+    "error": null
+  },
+  "profiling_metadata_linked": true,
+  "total_issues_found": 4,
+  "findings": [
+    {
+      "issue_id": "MISSING_VALUE",
+      "severity": "WARNING",
+      "column": "OrganizationNode",
+      "affected_count": 1,
+      "details": "Column 'OrganizationNode' contains 1 missing values (0.3%)."
+    },
+    {
+      "issue_id": "MISSING_VALUE",
+      "severity": "WARNING",
+      "column": "OrganizationLevel",
+      "affected_count": 1,
+      "details": "Column 'OrganizationLevel' contains 1 missing values (0.3%)."
+    },
+    {
+      "issue_id": "INVALID_AGE_AT_HIRE",
+      "severity": "ERROR",
+      "column": "HireDate/BirthDate",
+      "affected_count": 2,
+      "details": "Found 2 records where calculated age at hire is outside valid bounds [18-100]."
+    },
+    {
+      "issue_id": "OUTLIER_IQR",
+      "severity": "WARNING",
+      "column": "OrganizationLevel",
+      "affected_count": 6,
+      "details": "Column 'OrganizationLevel' contains 6 statistical outliers outside IQR bounds."
+    }
+  ]
+}

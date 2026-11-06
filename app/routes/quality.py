@@ -10,6 +10,24 @@ router = APIRouter(
 )
 
 
+# Approved dataset locations for local integration testing
+
+DATASET_REGISTRY = {
+    "hr_department": {
+        "path": r"C:\Users\ASUS\Downloads\HumanResources.Department (1).xlsx",
+        "name": "Department",
+        "id_cols": ["DepartmentID"]
+    },
+    "hr_employee": {
+        "path": r"C:\Users\ASUS\Downloads\HumanResources.Employee.xlsx",
+        "name": "Employee",
+        "id_cols": ["BusinessEntityID"],
+        "target_col": "VacationHours"
+    }
+}
+
+
+
 class QualityRequest(BaseModel):
     dataset_id: str
     version: str
@@ -19,20 +37,34 @@ class QualityRequest(BaseModel):
 def validate_dataset(request: QualityRequest):
 
     try:
-        result = check_data_quality()
+        dataset = DATASET_REGISTRY.get(request.dataset_id)
 
-        quality_metadata = {
-            "validation_summary": result["validation_summary"],
-            "issue_logs": result["issue_logs"]
-        }
+        if dataset is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Dataset not found"
+            )
+
+        result = check_data_quality(
+            dataset_source=dataset["path"],
+            dataset_name=dataset["name"],
+            id_cols=dataset["id_cols"],
+            target_col=dataset.get("target_col")
+        )
 
         return {
             "status": "success",
             "message": "Data quality validation completed successfully",
             "dataset_id": request.dataset_id,
             "version": request.version,
-            "quality_metadata": quality_metadata
+            "quality_metadata": {
+                "validation_summary": result["validation_summary"],
+                "issue_logs": result["issue_logs"]
+            }
         }
+
+    except HTTPException:
+        raise
 
     except Exception as error:
         raise HTTPException(
