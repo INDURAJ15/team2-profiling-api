@@ -48,7 +48,7 @@ def infer_type(series):
     if converted.notna().any():
         return "mixed"
 
-    dates = pd.to_datetime(values, errors="coerce")
+    dates = pd.to_datetime(values, errors="coerce", format="mixed")
 
     if dates.notna().all():
         return "datetime"
@@ -302,7 +302,7 @@ def profile_sample_dataset(
         elif inferred_type == "datetime":
 
             if include_statistics and not values.empty:
-                dates = pd.to_datetime(values, errors="coerce").dropna()
+                dates = pd.to_datetime(values, errors="coerce", format="mixed").dropna()
 
                 if not dates.empty:
                     info["summary"] = {
