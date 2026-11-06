@@ -53,16 +53,20 @@ def validate_dataset(request: QualityRequest):
         )
 
         return {
-            "status": "success",
-            "message": "Data quality validation completed successfully",
-            "dataset_id": request.dataset_id,
-            "version": request.version,
-            "quality_metadata": {
-                "validation_summary": result["validation_summary"],
-                "issue_logs": result["issue_logs"]
-            }
-        }
-
+    "status": result["status"],
+    "message": (
+        "Data quality validation completed successfully"
+        if result["status"] == "success"
+        else "Data quality validation failed"
+    ),
+    "dataset_id": request.dataset_id,
+    "version": request.version,
+    "quality_metadata": {
+        "validation_summary": result["validation_summary"],
+        "issue_logs": result["issue_logs"],
+        "errors": result.get("errors", [])
+    }
+}
     except HTTPException:
         raise
 
