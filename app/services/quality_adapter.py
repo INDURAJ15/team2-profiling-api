@@ -9,43 +9,77 @@ def check_data_quality(
     target_col=None,
     id_cols=None
 ):
-    # Load dataset
-    df = load_dataset(dataset_source)
+    try:
+        # Load dataset
+        df = load_dataset(dataset_source)
 
-    # Run Team 1 Data Quality Engine
-    engine = DataQualityEngine(
-        df,
-        dataset_name=dataset_name,
-        target_col=target_col,
-        id_cols=id_cols or ["employee_id"]
-    )
+        # Run Team 1 Data Quality Engine
+        engine = DataQualityEngine(
+            df,
+            dataset_name=dataset_name,
+            target_col=target_col,
+            id_cols=id_cols or ["employee_id"]
+        )
 
-    result_df = engine.run_checks()
+        result_df = engine.run_checks()
 
-    # Convert Team 1 findings into API response format
-    issue_logs = []
+        # Convert Team 1 findings into API response format
+        issue_logs = []
 
-    for _, row in result_df.iterrows():
-        issue_logs.append({
-            "issue_id": row["RuleID"],
-            "category": row["Category"],
-            "severity": row["Severity"],
-            "affected_column": row["Column"],
-            "affected_row_count": row["AffectedRows"],
-            "description": row["Description"],
-            "recommended_action": row["Recommendation"]
-        })
+        for _, row in result_df.iterrows():
+            issue_logs.append({
+                "issue_id": row["RuleID"],
+                "category": row["Category"],
+                "severity": row["Severity"],
+                "affected_column": row["Column"],
+                "affected_row_count": row["AffectedRows"],
+                "description": row["Description"],
+                "recommended_action": row["Recommendation"]
+            })
 
-    return {
-        "status": "success",
-        "validation_summary": {
-            "total_issues_detected": len(issue_logs),
-            "total_duplicate_records": sum(
-                1 for issue in issue_logs
-                if issue["category"] == "Duplicate Identifiers"
-            ),
-            "execution_mode": "non_destructive",
-            "source_mutated": False
-        },
-        "issue_logs": issue_logs
-    }
+        return {
+            "status": "success",
+            "validation_summary": {
+                "total_issues_detected": len(issue_logs),
+                "total_duplicate_records": sum(
+                    1 for issue in issue_logs
+                    if issue["category"] == "Duplicate Identifiers"
+                ),
+                "execution_mode": "non_destructive",
+                "source_mutated": False
+            },
+            "issue_logs": issue_logs,
+            "errors": []
+        }
+
+    except FileNotFoundError:
+        return {
+            "status": "failed",
+            "validation_summary": {
+                "total_issues_detected": 0,
+                "total_duplicate_records": 0,
+                "execution_mode": "non_destructive",
+                "source_mutated": False
+            },
+            "issue_logs": [],
+            "errors": [{
+                "code": "SOURCE_NOT_FOUND",
+                "message": "Dataset file was not found."
+            }]
+        }
+
+    except Exception:
+        return {
+            "status": "failed",
+            "validation_summary": {
+                "total_issues_detected": 0,
+                "total_duplicate_records": 0,
+                "execution_mode": "non_destructive",
+                "source_mutated": False
+            },
+            "issue_logs": [],
+            "errors": [{
+                "code": "QUALITY_SERVICE_ERROR",
+                "message": "An error occurred while processing data quality checks."
+            }]
+        }
