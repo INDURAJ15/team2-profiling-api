@@ -86,20 +86,35 @@ def run_dataset_services(
         overall_status = "success"
 
     # 4. Return combined orchestration response
+         # 4. Return combined orchestration response
     return {
         "dataset_context": dataset_context,
         "status": overall_status,
+
         "service_status": {
             "profiling": profiling_status,
-            "quality": quality_status
+            "quality": quality_status,
+            "semantic_analysis": "not_configured"
         },
+
         "downstream_context": {
             "profiling_output_available": profiling_status != "failed",
             "quality_findings_available": quality_status != "failed",
+            "semantic_output_available": False,
             "quality_issue_count": quality_result.get(
                 "validation_summary", {}
             ).get("total_issues_detected", 0)
         },
+
         "profiling": profiling_result,
-        "quality": quality_result
+        "quality": quality_result,
+
+        "semantic_analysis": {
+            "status": "not_configured",
+            "message": (
+                "Semantic Analysis service/API contract "
+                "is not yet available for integration."
+            )
+        }
     }
+    
