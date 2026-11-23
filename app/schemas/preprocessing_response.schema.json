@@ -1,0 +1,298 @@
+{
+    "$schema":  "https://json-schema.org/draft/2020-12/schema",
+    "title":  "Preprocessing Response",
+    "description":  "Generic result returned by the preprocessing and feature engineering module, including Data Quality Engine reports.",
+    "type":  "object",
+    "additionalProperties":  false,
+    "required":  [
+                     "request_id",
+                     "status",
+                     "prepared_dataset",
+                     "feature_list",
+                     "transformation_steps",
+                     "warnings",
+                     "error"
+                 ],
+    "properties":  {
+                       "request_id":  {
+                                          "type":  "string",
+                                          "minLength":  1
+                                      },
+                       "status":  {
+                                      "type":  "string",
+                                      "enum":  [
+                                                   "success",
+                                                   "partial_success",
+                                                   "failed",
+                                                   "review_required"
+                                               ]
+                                  },
+                       "prepared_dataset":  {
+                                                "type":  [
+                                                             "object",
+                                                             "null"
+                                                         ],
+                                                "additionalProperties":  false,
+                                                "required":  [
+                                                                 "dataset_id",
+                                                                 "format"
+                                                             ],
+                                                "properties":  {
+                                                                   "dataset_id":  {
+                                                                                      "type":  "string",
+                                                                                      "minLength":  1
+                                                                                  },
+                                                                   "format":  {
+                                                                                  "type":  "string",
+                                                                                  "enum":  [
+                                                                                               "csv",
+                                                                                               "parquet",
+                                                                                               "dataframe",
+                                                                                               "api_payload"
+                                                                                           ]
+                                                                              },
+                                                                   "location":  {
+                                                                                    "type":  [
+                                                                                                 "string",
+                                                                                                 "null"
+                                                                                             ]
+                                                                                },
+                                                                   "row_count":  {
+                                                                                     "type":  [
+                                                                                                  "integer",
+                                                                                                  "null"
+                                                                                              ],
+                                                                                     "minimum":  0
+                                                                                 },
+                                                                   "column_count":  {
+                                                                                        "type":  [
+                                                                                                     "integer",
+                                                                                                     "null"
+                                                                                                 ],
+                                                                                        "minimum":  0
+                                                                                    }
+                                                               }
+                                            },
+                       "feature_list":  {
+                                            "type":  "array",
+                                            "items":  {
+                                                          "type":  "object",
+                                                          "additionalProperties":  false,
+                                                          "required":  [
+                                                                           "name",
+                                                                           "data_type",
+                                                                           "role"
+                                                                       ],
+                                                          "properties":  {
+                                                                             "name":  {
+                                                                                          "type":  "string",
+                                                                                          "minLength":  1
+                                                                                      },
+                                                                             "data_type":  {
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                             "role":  {
+                                                                                          "type":  "string",
+                                                                                          "enum":  [
+                                                                                                       "feature",
+                                                                                                       "target",
+                                                                                                       "identifier",
+                                                                                                       "excluded"
+                                                                                                   ]
+                                                                                      }
+                                                                         }
+                                                      }
+                                        },
+                       "transformation_steps":  {
+                                                    "type":  "array",
+                                                    "items":  {
+                                                                  "type":  "object",
+                                                                  "additionalProperties":  false,
+                                                                  "required":  [
+                                                                                   "step",
+                                                                                   "status",
+                                                                                   "affected_columns"
+                                                                               ],
+                                                                  "properties":  {
+                                                                                     "step":  {
+                                                                                                  "type":  "string",
+                                                                                                  "minLength":  1
+                                                                                              },
+                                                                                     "status":  {
+                                                                                                    "type":  "string",
+                                                                                                    "enum":  [
+                                                                                                                 "planned",
+                                                                                                                 "applied",
+                                                                                                                 "skipped",
+                                                                                                                 "failed",
+                                                                                                                 "review_required"
+                                                                                                             ]
+                                                                                                },
+                                                                                     "parameters":  {
+                                                                                                        "type":  "object"
+                                                                                                    },
+                                                                                     "affected_columns":  {
+                                                                                                              "type":  "array",
+                                                                                                              "items":  {
+                                                                                                                            "type":  "string"
+                                                                                                                        }
+                                                                                                          },
+                                                                                     "message":  {
+                                                                                                     "type":  [
+                                                                                                                  "string",
+                                                                                                                  "null"
+                                                                                                              ]
+                                                                                                 }
+                                                                                 }
+                                                              }
+                                                },
+                       "warnings":  {
+                                        "type":  "array",
+                                        "items":  {
+                                                      "type":  "object",
+                                                      "additionalProperties":  false,
+                                                      "required":  [
+                                                                       "code",
+                                                                       "message",
+                                                                       "severity"
+                                                                   ],
+                                                      "properties":  {
+                                                                         "code":  {
+                                                                                      "type":  "string"
+                                                                                  },
+                                                                         "message":  {
+                                                                                         "type":  "string"
+                                                                                     },
+                                                                         "severity":  {
+                                                                                          "type":  "string",
+                                                                                          "enum":  [
+                                                                                                       "info",
+                                                                                                       "warning",
+                                                                                                       "error"
+                                                                                                   ]
+                                                                                      },
+                                                                         "column":  {
+                                                                                        "type":  [
+                                                                                                     "string",
+                                                                                                     "null"
+                                                                                                 ]
+                                                                                    }
+                                                                     }
+                                                  }
+                                    },
+                       "error":  {
+                                     "type":  [
+                                                  "object",
+                                                  "null"
+                                              ],
+                                     "additionalProperties":  false,
+                                     "required":  [
+                                                      "code",
+                                                      "message"
+                                                  ],
+                                     "properties":  {
+                                                        "code":  {
+                                                                     "type":  "string"
+                                                                 },
+                                                        "message":  {
+                                                                        "type":  "string"
+                                                                    },
+                                                        "field":  {
+                                                                      "type":  [
+                                                                                   "string",
+                                                                                   "null"
+                                                                               ]
+                                                                  }
+                                                    }
+                                 },
+                       "data_quality_reports":  {
+                                                    "type":  "array",
+                                                    "description":  "Original Data Quality Engine reports preserved for traceability.",
+                                                    "items":  {
+                                                                  "type":  "object",
+                                                                  "additionalProperties":  false,
+                                                                  "required":  [
+                                                                                   "file",
+                                                                                   "sheet",
+                                                                                   "total_rows",
+                                                                                   "total_columns",
+                                                                                   "total_issues_detected",
+                                                                                   "is_source_modified",
+                                                                                   "issues"
+                                                                               ],
+                                                                  "properties":  {
+                                                                                     "file":  {
+                                                                                                  "type":  "string",
+                                                                                                  "minLength":  1
+                                                                                              },
+                                                                                     "sheet":  {
+                                                                                                   "type":  [
+                                                                                                                "string",
+                                                                                                                "null"
+                                                                                                            ]
+                                                                                               },
+                                                                                     "total_rows":  {
+                                                                                                        "type":  "integer",
+                                                                                                        "minimum":  0
+                                                                                                    },
+                                                                                     "total_columns":  {
+                                                                                                           "type":  "integer",
+                                                                                                           "minimum":  0
+                                                                                                       },
+                                                                                     "total_issues_detected":  {
+                                                                                                                   "type":  "integer",
+                                                                                                                   "minimum":  0
+                                                                                                               },
+                                                                                     "is_source_modified":  {
+                                                                                                                "type":  "boolean",
+                                                                                                                "const":  false
+                                                                                                            },
+                                                                                     "issues":  {
+                                                                                                    "type":  "array",
+                                                                                                    "items":  {
+                                                                                                                  "type":  "object",
+                                                                                                                  "additionalProperties":  false,
+                                                                                                                  "required":  [
+                                                                                                                                   "issue_id",
+                                                                                                                                   "column",
+                                                                                                                                   "severity",
+                                                                                                                                   "affected_count",
+                                                                                                                                   "percentage",
+                                                                                                                                   "description"
+                                                                                                                               ],
+                                                                                                                  "properties":  {
+                                                                                                                                     "issue_id":  {
+                                                                                                                                                      "type":  "string",
+                                                                                                                                                      "minLength":  1
+                                                                                                                                                  },
+                                                                                                                                     "column":  {
+                                                                                                                                                    "type":  "string",
+                                                                                                                                                    "minLength":  1
+                                                                                                                                                },
+                                                                                                                                     "severity":  {
+                                                                                                                                                      "type":  "string",
+                                                                                                                                                      "enum":  [
+                                                                                                                                                                   "WARNING",
+                                                                                                                                                                   "CRITICAL"
+                                                                                                                                                               ]
+                                                                                                                                                  },
+                                                                                                                                     "affected_count":  {
+                                                                                                                                                            "type":  "integer",
+                                                                                                                                                            "minimum":  0
+                                                                                                                                                        },
+                                                                                                                                     "percentage":  {
+                                                                                                                                                        "type":  "number",
+                                                                                                                                                        "minimum":  0,
+                                                                                                                                                        "maximum":  100
+                                                                                                                                                    },
+                                                                                                                                     "description":  {
+                                                                                                                                                         "type":  "string"
+                                                                                                                                                     }
+                                                                                                                                 }
+                                                                                                              }
+                                                                                                }
+                                                                                 }
+                                                              }
+                                                }
+                   }
+}

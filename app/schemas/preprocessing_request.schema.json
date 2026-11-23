@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Preprocessing Request",
+  "description": "Preprocessing request with Data Quality Engine and profiling metadata integration.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "request_id",
+    "dataset",
+    "target",
+    "problem_type",
+    "preprocessing_options"
+  ],
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dataset_id",
+        "format"
+      ],
+      "properties": {
+        "dataset_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "xlsx",
+            "parquet",
+            "dataframe",
+            "api_payload"
+          ]
+        },
+        "location": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "target": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "problem_type": {
+      "type": "string",
+      "enum": [
+        "classification",
+        "regression",
+        "clustering",
+        "unknown"
+      ]
+    },
+    "data_quality_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "validation_status",
+        "total_errors",
+        "total_warnings",
+        "quality_rules_evaluated"
+      ],
+      "properties": {
+        "validation_status": {
+          "type": "string",
+          "enum": [
+            "SUCCESS",
+            "SUCCESS_WITH_WARNINGS",
+            "FAILED"
+          ]
+        },
+        "total_errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "quality_rules_evaluated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_id",
+              "column",
+              "severity",
+              "affected_rows",
+              "description",
+              "recommended_action"
+            ],
+            "properties": {
+              "rule_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "column": {
+                "type": "string",
+                "minLength": 1
+              },
+              "severity": {
+                "type": "string",
+                "enum": [
+                  "LOW",
+                  "INFORMATIONAL",
+                  "MEDIUM",
+                  "BLOCKING"
+                ]
+              },
+              "affected_rows": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "description": {
+                "type": "string"
+              },
+              "recommended_action": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "data_quality_reports": {
+      "type": "array",
+      "description": "Finalized Data Quality Engine reports supplied for preprocessing.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "file",
+          "sheet",
+          "total_rows",
+          "total_columns",
+          "total_issues_detected",
+          "is_source_modified",
+          "issues"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sheet": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total_rows": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_columns": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "total_issues_detected": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "is_source_modified": {
+            "type": "boolean",
+            "const": false
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "issue_id",
+                "column",
+                "severity",
+                "affected_count",
+                "percentage",
+                "description"
+              ],
+              "properties": {
+                "issue_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "column": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "severity": {
+                  "type": "string",
+                  "enum": [
+                    "WARNING",
+                    "CRITICAL"
+                  ]
+                },
+                "affected_count": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "percentage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "description": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "source_data_preserved": {
+      "type": "boolean",
+      "const": true
+    },
+    "profiling_metadata_received": {
+      "type": "boolean"
+    },
+    "profiling_metadata": {
+      "type": "object",
+      "description": "Metadata returned by the profiling module.",
+      "additionalProperties": true
+    },
+    "quality_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "category",
+          "severity"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ]
+          },
+          "column": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "preprocessing_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "handle_missing_values",
+        "encode_categorical"
+      ],
+      "properties": {
+        "handle_missing_values": {
+          "type": "boolean"
+        },
+        "encode_categorical": {
+          "type": "boolean"
+        },
+        "scale_numeric": {
+          "type": "boolean",
+          "default": false
+        },
+        "extract_date_features": {
+          "type": "boolean",
+          "default": false
+        },
+        "rare_category_threshold": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "identifier_columns": {
+      "type": "array",
+      "description": "Column names explicitly declared as identifiers by the user.",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
